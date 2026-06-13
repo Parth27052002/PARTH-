@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maregaon Survey Form</title>
+  <style>
+    :root {
+      --bg-app: #f4f6f9;
+      --bg-card: #ffffff;
+      --bg-input: #f8f9fa;
+      --text-main: #2d3748;
+      --text-sub: #718096;
+      --border-color: #e2e8f0;
+      --primary: #378ADD;
+      --primary-hover: #185FA5;
+      
+      --bg-badge: #ebf8ff;
+      --text-badge: #2b6cb0;
+      
+      --border-radius-sm: 8px;
+      --border-radius-md: 12px;
+      --border-radius-lg: 16px;
+      --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg-app: #0f1115;
+      --bg-card: #161920;
+      --bg-input: #1f232d;
+      --text-main: #e2e8f0;
+      --text-sub: #a0aec0;
+      --border-color: #2d3748;
+      
+      --bg-badge: #1a202c;
+      --text-badge: #63b3ed;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg-app); color: var(--text-main); font-family: var(--font-sans); transition: background 0.3s, color 0.3s; padding: 1rem 0; }
+    
+    .app { max-width: 650px; margin: 0 auto; padding: 0 1rem; }
+    
+    /* Top Bar Custom Design */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--bg-card); padding: 1rem 1.25rem; border-radius: var(--border-radius-md); box-shadow: var(--box-shadow); border: 1px solid var(--border-color); }
+    .logo-area span { font-size: 11px; color: var(--text-sub); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+    .logo-area .title-text { font-size: 18px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+    
+    .action-group { display: flex; gap: 8px; align-items: center; }
+    .count-badge { font-size: 12px; font-weight: 600; background: var(--bg-badge); color: var(--text-badge); padding: 5px 12px; border-radius: 20px; }
+    
+    .export-btn, .settings-toggle-btn { font-size: 13px; font-weight: 500; color: var(--text-main); background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 6px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .export-btn:hover, .settings-toggle-btn:hover { background: var(--border-color); }
+
+    /* Settings Panel Design */
+    .settings-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--box-shadow); display: none; animation: slideDown 0.2s ease-out; }
+    .settings-panel.visible { display: block; }
+    .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .settings-row:last-child { margin-bottom: 0; }
+    .settings-label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .settings-select { font-size: 13px; padding: 6px 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); outline: none; }
+
+    /* Modern Tabs */
+    .tab-row { display: flex; background: var(--bg-card); padding: 4px; border-radius: var(--border-radius-md); margin-bottom: 1.5rem; box-shadow: var(--box-shadow); border: 1px solid var(--border-color); }
+    .tab { flex: 1; text-align: center; font-size: 14px; font-weight: 600; padding: 10px 0; cursor: pointer; color: var(--text-sub); border: none; background: none; border-radius: var(--border-radius-sm); transition: all 0.2s; }
+    .tab.active { color: #fff; background: var(--primary); box-shadow: 0 4px 10px rgba(55,138,221,0.3); }
+
+    /* Beautiful Card Form Sections */
+    .form-card-section { background: var(--bg-card); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: var(--box-shadow); border: 1px solid var(--border-color); }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { font-size: 12px; font-weight: 600; color: var(--text-sub); }
+    
+    .field input, .field select { font-size: 14px; padding: 9px 12px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); width: 100%; transition: all 0.2s; }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+
+    /* Premium Radio & Toggle Buttons */
+    .radio-group { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 0; }
+    .radio-group label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-main); }
+    .radio-group input { width: 16px; height: 16px; accent-color: var(--primary); }
+
+    .yn-group { display: flex; gap: 8px; margin-top: 4px; }
+    .yn-btn { flex: 1; padding: 10px 0; font-size: 13px; font-weight: 600; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-sub); cursor: pointer; border-radius: var(--border-radius-sm); transition: all 0.2s; }
+    .yn-btn.yes.active  { background: #e6fffa; color: #00875a; border-color: #00b574; }
+    .yn-btn.no.active   { background: #ffebe6; color: #de350b; border-color: #ff5630; }
+    
+    [data-theme="dark"] .yn-btn.yes.active { background: #1c2d27; color: #38d9a9; border-color: #00b574; }
+    [data-theme="dark"] .yn-btn.no.active { background: #2d1c1c; color: #ff8787; border-color: #ff5630; }
+
+    /* Document Box Custom Designs */
+    .doc-box { border-radius: var(--border-radius-md); padding: 1rem; border: 1px solid var(--border-color); background: var(--bg-input); margin-top: 10px; }
+    .doc-box.blue { border-left: 4px solid #378ADD; }
+    .doc-box.green { border-left: 4px solid #0f6e56; }
+    .doc-box.amber { border-left: 4px solid #854f0b; }
+    .doc-box-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+
+    /* Upload & OCR UI */
+    .upload-box { border: 2px dashed var(--border-color); border-radius: var(--border-radius-sm); padding: 1.25rem; text-align: center; cursor: pointer; background: var(--bg-card); position: relative; transition: all 0.2s; }
+    .upload-box:hover { border-color: var(--primary); background: var(--bg-input); }
+    .upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-box .ub-label { font-size: 13px; font-weight: 500; color: var(--text-main); margin-top: 6px; }
+    .upload-box .ub-sub   { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    
+    .preview-img { width: 100%; max-height: 140px; object-fit: contain; border-radius: var(--border-radius-sm); margin-top: 10px; border: 1px solid var(--border-color); }
+    .ocr-btn { margin-top: 10px; background: var(--primary); color: #fff; border: none; border-radius: var(--border-radius-sm); padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center; transition: background 0.2s; }
+    .ocr-btn:hover { background: var(--primary-hover); }
+    .ocr-btn:disabled { background: var(--border-color); color: var(--text-sub); cursor: not-allowed; }
+    
+    .ocr-result { margin-top: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; }
+    .ocr-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--bg-input); }
+    .ocr-row:last-child { border-bottom: none; }
+    .ocr-label { color: var(--text-sub); font-size: 12px; font-weight: 500; }
+    .ocr-val   { font-weight: 600; color: var(--text-main); }
+    .ocr-val.mono { font-family: var(--font-mono); letter-spacing: 0.5px; }
+    
+    .action-btns { display: flex; gap: 8px; margin-top: 10px; }
+    .use-btn { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .use-btn.green { background: #e6fffa; color: #00875a; }
+    .use-btn.gray  { background: var(--bg-input); color: var(--text-sub); border: 1px solid var(--border-color); }
+
+    /* Bottom Sticky Row or Grid Buttons */
+    .btn-row { display: flex; gap: 12px; margin-top: 1.5rem; }
+    .btn-primary   { flex: 2; background: var(--primary); color: #fff; border: none; border-radius: var(--border-radius-sm); padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; justify-content: center; box-shadow: 0 4px 12px rgba(55,138,221,0.25); transition: background 0.2s; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { flex: 1; background: transparent; color: var(--text-sub); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-secondary:hover { background: var(--bg-input); }
+
+    /* Saved Cards View Layout */
+    .saved-card { background: var(--bg-card); border-radius: var(--border-radius-md); border: 1px solid var(--border-color); padding: 12px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--box-shadow); }
+    .saved-card .sname { font-size: 15px; font-weight: 600; color: var(--text-main); }
+    .saved-card .smeta { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+    .del-btn { background: none; border: none; cursor: pointer; color: var(--text-sub); padding: 6px; border-radius: 6px; transition: all 0.2s; }
+    .del-btn:hover { color: #de350b; background: #ffebe6; }
+
+    /* Animations & Toast */
+    .upload-section { overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; }
+    .upload-section.hidden { max-height: 0; opacity: 0; pointer-events: none; margin-top: 0; }
+    .upload-section.visible { max-height: 500px; opacity: 1; margin-top: 12px; }
+
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 10px 24px; border-radius: 30px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 99; white-space: nowrap; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-sub); font-size: 14px; background: var(--bg-card); border-radius: var(--border-radius-lg); border: 1px solid var(--border-color); box-shadow: var(--box-shadow); }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+
+<div class="app">
+  <div class="top-bar">
+    <div class="logo-area">
+      <span>Maregaon</span>
+      <div class="title-text" data-i18n="title">कुटुंब सर्वेक्षण नोंद</div>
+    </div>
+    <div class="action-group">
+      <span class="count-badge" id="count-badge">0 नोंदी</span>
+      <button class="settings-toggle-btn" onclick="toggleSettings()"><i class="ti ti-settings"></i> <span data-i18n="settings_btn">सेटिंग्ज</span></button>
+      <button class="export-btn" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button>
+    </div>
+  </div>
+
+  <div class="settings-panel" id="settings-panel">
+    <div class="settings-row">
+      <span class="settings-label" data-i18n="setting_lang">भाषा / Language:</span>
+      <select class="settings-select" id="lang-select" onchange="changeLanguage(this.value)">
+        <option value="mr">मराठी</option>
+        <option value="hi">हिंदी</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label" data-i18n="setting_theme">थीम / Theme:</span>
+      <select class="settings-select" id="theme-select" onchange="changeTheme(this.value)">
+        <option value="light">Light Mode</option>
+        <option value="dark">Dark Mode</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tab-row">
+    <button class="tab active" id="tab-form" onclick="showTab('form',this)" data-i18n="tab_new">नवीन नोंद</button>
+    <button class="tab" id="tab-list" onclick="showTab('list',this)" data-i18n="tab_view">नोंदी पहा</button>
+  </div>
+
+  <div id="view-form">
+    
+    <div class="form-card-section">
+      <div class="section-title"><i class="ti ti-home-2"></i> <span data-i18n="sec_home">घर माहिती</span></div>
+      <div class="grid3">
+        <div class="field"><label data-i18n="lbl_ghar_kr">घर क्र.</label><input type="number" id="ghar_kr" placeholder="1"></div>
+        <div class="field"><label data-i18n="lbl_kutumb_kr">कुटुंब क्र.</label><input type="number" id="kutumb_kr" placeholder="1"></div>
+        <div class="field"><label data-i18n="lbl_anu_kr">अनु क्र.</label><input type="number" id="anu_kr" placeholder="1"></div>
+      </div>
+    </div>
+
+    <div class="form-card-section">
+      <div class="section-title"><i class="ti ti-user"></i> <span data-i18n="sec_member">सदस्य माहिती</span></div>
+      <div class="grid2">
+        <div class="field"><label data-i18n="lbl_nav">नाव *</label><input type="text" id="nav" placeholder="पूर्ण नाव लिखा"></div>
+        <div class="field"><label data-i18n="lbl_nate">नाते</label>
+          <select id="nate">
+            <option value="" data-i18n="opt_select">निवडा</option>
+            <option value="स्वतः (प्रमुख)" data-i18n="opt_self">स्वतः (प्रमुख)</option>
+            <option value="पती/पत्नी" data-i18n="opt_spouse">पती/पत्नी</option>
+            <option value="मुलगा" data-i18n="opt_son">मुलगा</option>
+            <option value="मुलगी" data-i18n="opt_daughter">मुलगी</option>
+            <option value="सून" data-i18n="opt_dil">सून</option>
+            <option value="जावई" data-i18n="opt_sil">जावई</option>
+            <option value="आई/वडील" data-i18n="opt_parents">आई/वडील</option>
+            <option value="नातू/नात" data-i18n="opt_grandchild">नातू/नात</option>
+            <option value="इतर" data-i18n="opt_other">इतर</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:10px;">
+        <div class="field"><label data-i18n="lbl_gender">लिंग</label>
+          <div class="radio-group">
+            <label><input type="radio" name="ling" value="पुरुष"> <span data-i18n="rdo_male">पुरुष</span></label>
+            <label><input type="radio" name="ling" value="महिला"> <span data-i18n="rdo_female">महिला</span></label>
+            <label><input type="radio" name="ling" value="इतर"> <span data-i18n="rdo_gender_other">इतर</span></label>
+          </div>
+        </div>
+        <div class="field"><label data-i18n="lbl_dob">जन्मतारीख</label><input type="date" id="dob"></div>
+      </div>
+    </div>
+
+    <div class="form-card-section">
+      <div class="section-title"><i class="ti ti-users"></i> <span data-i18n="sec_religion">धर्म / जात</span></div>
+      <div class="grid2">
+        <div class="field"><label data-i18n="lbl_religion">धर्म</label>
+          <select id="dharma">
+            <option value="" data-i18n="opt_select">निवडा</option>
+            <option value="हिंदू" data-i18n="rel_hindu">हिंदू</option>
+            <option value="मुस्लिम" data-i18n="rel_muslim">मुस्लिम</option>
+            <option value="बौद्ध" data-i18n="rel_buddhist">बौद्ध</option>
+            <option value="ख्रिस्ती" data-i18n="rel_christian">ख्रिस्ती</option>
+            <option value="शीख" data-i18n="rel_sikh">शीख</option>
+            <option value="जैन" data-i18n="rel_jain">जैन</option>
+            <option value="इतर" data-i18n="opt_other">इतर</option>
+          </select>
+        </div>
+        <div class="field"><label data-i18n="lbl_caste">जात / जमाती</label><input type="text" id="jaat" placeholder="जात लिखा"></div>
+      </div>
+      
+      <div style="margin-top:14px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+        <div class="grid2">
+          <div class="field"><label data-i18n="lbl_bpl">दारिद्र्य रेषेखालील?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="bpl" value="होय"> <span data-i18n="rdo_yes">होय</span></label>
+              <label><input type="radio" name="bpl" value="नाही"> <span data-i18n="rdo_no">नाही</span></label>
+            </div>
+          </div>
+          <div class="field"><label data-i18n="lbl_pregnant">सध्या गरोदर आहे?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="garodar" value="होय"> <span data-i18n="rdo_yes">होय</span></label>
+              <label><input type="radio" name="garodar" value="नाही"> <span data-i18n="rdo_no">नाही</span></label>
+              <label><input type="radio" name="garodar" value="लागू नाही"> <span data-i18n="rdo_na">लागू नाही</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card-section">
+      <div class="section-title"><i class="ti ti-id"></i> <span data-i18n="sec_aadhar">दस्तऐवज आणि संपर्क</span></div>
+      
+      <div class="field" style="margin-bottom:14px;">
+        <label data-i18n="lbl_mobile">मोबाईल नंबर</label>
+        <input type="tel" id="mobile" placeholder="10 अंकी नंबर" maxlength="10">
+      </div>
+
+      <div class="doc-box blue">
+        <div class="doc-box-title" style="color:#185FA5;"><i class="ti ti-id-badge-2"></i> <span data-i18n="sec_aadhar">आधार कार्ड</span></div>
+        <div class="field" style="margin-bottom:10px;">
+          <label data-i18n="lbl_aadhar_no">आधार नंबर</label>
+          <input type="text" id="aadhar" placeholder="XXXX XXXX XXXX" maxlength="14" oninput="fmtAadhar(this)">
+        </div>
+        <div class="field">
+          <label data-i18n="lbl_has_aadhar">आधार कार्ड आहे का?</label>
+          <div class="yn-group">
+            <button class="yn-btn yes" onclick="toggleCard('aadhar','yes',this)" data-i18n="btn_yes_upload">✓ होय — अपलोड</button>
+            <button class="yn-btn no"  onclick="toggleCard('aadhar','no',this)" data-i18n="btn_no_label">✗ नाही</button>
+          </div>
+        </div>
+        <div class="upload-section hidden" id="us-aadhar">
+          <div class="upload-box" id="uz-aadhar">
+            <input type="file" accept="image/*" onchange="handleFile(this,'aadhar')">
+            <i class="ti ti-camera-upload" style="font-size:26px;color:var(--primary);"></i>
+            <div class="ub-label" data-i18n="upload_box_label">फोटो निवडा किंवा कॅмера वापरा</div>
+            <div class="ub-sub">JPG, PNG चालेल</div>
+          </div>
+          <div id="pv-aadhar" style="display:none;">
+            <img id="img-aadhar" class="preview-img" alt="Aadhar preview">
+            <button class="ocr-btn" id="obtn-aadhar" onclick="runOCR('aadhar')">
+              <i class="ti ti-sparkles"></i> <span data-i18n="btn_ocr_aadhar">AI ने आधार नंबर वाचा</span>
+            </button>
+            <div id="res-aadhar" class="ocr-result" style="display:none;">
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_aadhar_no">आधार नंबर</span><span class="ocr-val mono" id="rv-aadhar-num">—</span></div>
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_nav">नाव</span><span class="ocr-val" id="rv-aadhar-name">—</span></div>
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_dob">जन्मतारीख</span><span class="ocr-val" id="rv-aadhar-dob">—</span></div>
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_gender">लिंग</span><span class="ocr-val" id="rv-aadhar-gen">—</span></div>
+              <div class="action-btns">
+                <button class="use-btn green" onclick="applyOCR('aadhar')"><i class="ti ti-check"></i> <span data-i18n="btn_use_form">फॉर्ममध्ये वापरा</span></button>
+                <button class="use-btn gray"  onclick="resetUpload('aadhar')"><i class="ti ti-refresh"></i> <span data-i18n="btn_reupload">पुन्हा अपलोड</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-box green" style="margin-top:14px;">
+        <div class="doc-box-title" style="color:#0F6E56;"><i class="ti ti-heart-rate-monitor"></i> <span data-i18n="sec_abha">आभा कार्ड (ABHA)</span></div>
+        <div class="field" style="margin-bottom:10px;">
+          <label data-i18n="lbl_abha_no">आभा नंबर</label>
+          <input type="text" id="abha_no" placeholder="XX-XXXX-XXXX-XXXX" maxlength="17" oninput="fmtAbha(this)">
+        </div>
+        <div class="field">
+          <label data-i18n="lbl_has_abha">आभा कार्ड आहे का?</label>
+          <div class="yn-group">
+            <button class="yn-btn yes" onclick="toggleCard('abha','yes',this)" data-i18n="btn_yes_upload">✓ होय — अपलोड</button>
+            <button class="yn-btn no"  onclick="toggleCard('abha','no',this)" data-i18n="btn_no_label">✗ नाही</button>
+          </div>
+        </div>
+        <div class="upload-section hidden" id="us-abha">
+          <div class="upload-box" id="uz-abha">
+            <input type="file" accept="image/*" onchange="handleFile(this,'abha')">
+            <i class="ti ti-camera-upload" style="font-size:26px;color:#0F6E56;"></i>
+            <div class="ub-label" data-i18n="upload_box_label">फोटो निवडा किंवा कॅмера वापरा</div>
+          </div>
+          <div id="pv-abha" style="display:none;">
+            <img id="img-abha" class="preview-img" alt="ABHA preview">
+            <button class="ocr-btn" style="background:#0F6E56" id="obtn-abha" onclick="runOCR('abha')">
+              <i class="ti ti-sparkles"></i> <span data-i18n="btn_ocr_abha">AI ने आभा नंबर वाचा</span>
+            </button>
+            <div id="res-abha" class="ocr-result" style="display:none;">
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_abha_no">आभा नंबर</span><span class="ocr-val mono" id="rv-abha-num">—</span></div>
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_nav">नाव</span><span class="ocr-val" id="rv-abha-name">—</span></div>
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_dob">जन्मतारीख</span><span class="ocr-val" id="rv-abha-dob">—</span></div>
+              <div class="action-btns">
+                <button class="use-btn green" onclick="applyOCR('abha')"><i class="ti ti-check"></i> <span data-i18n="btn_use_form">फॉर्ममध्ये वापरा</span></button>
+                <button class="use-btn gray"  onclick="resetUpload('abha')"><i class="ti ti-refresh"></i> <span data-i18n="btn_reupload">पुन्हा अपलोड</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-box amber" style="margin-top:14px;">
+        <div class="doc-box-title" style="color:#854F0B;"><i class="ti ti-building-hospital"></i> <span data-i18n="sec_ayush">आयुष्मान कार्ड</span></div>
+        <div class="field" style="margin-bottom:10px;">
+          <label data-i18n="lbl_ayush_no">आयुष्मान कार्ड नंबर</label>
+          <input type="text" id="ayush_no" placeholder="कार्ड नंबर">
+        </div>
+        <div class="field">
+          <label data-i18n="lbl_has_ayush">आयुष्मान कार्ड आहे का?</label>
+          <div class="yn-group">
+            <button class="yn-btn yes" onclick="toggleCard('ayush','yes',this)" data-i18n="btn_yes_upload">✓ होय — अपलोड</button>
+            <button class="yn-btn no"  onclick="toggleCard('ayush','no',this)" data-i18n="btn_no_label">✗ नाही</button>
+          </div>
+        </div>
+        <div class="upload-section hidden" id="us-ayush">
+          <div class="upload-box" id="uz-ayush">
+            <input type="file" accept="image/*" onchange="handleFile(this,'ayush')">
+            <i class="ti ti-camera-upload" style="font-size:26px;color:#854F0B;"></i>
+            <div class="ub-label" data-i18n="upload_box_label">फोटो निवडा किंवा कॅмера वापरा</div>
+          </div>
+          <div id="pv-ayush" style="display:none;">
+            <img id="img-ayush" class="preview-img" alt="Ayushman preview">
+            <button class="ocr-btn" style="background:#854F0B" id="obtn-ayush" onclick="runOCR('ayush')">
+              <i class="ti ti-sparkles"></i> <span data-i18n="btn_ocr_ayush">AI ने आयुष्मान नंबर वाचा</span>
+            </button>
+            <div id="res-ayush" class="ocr-result" style="display:none;">
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_ayush_no">आयुष्मान नंबर</span><span class="ocr-val mono" id="rv-ayush-num">—</span></div>
+              <div class="ocr-row"><span class="ocr-label" data-i18n="lbl_nav">नाव</span><span class="ocr-val" id="rv-ayush-name">—</span></div>
+              <div class="action-btns">
+                <button class="use-btn green" onclick="applyOCR('ayush')"><i class="ti ti-check"></i> <span data-i18n="btn_use_form">फॉर्ममध्ये वापरा</span></button>
+                <button class="use-btn gray"  onclick="resetUpload('ayush')"><i class="ti ti-refresh"></i> <span data-i18n="btn_reupload">पुन्हा अपलोड</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="form-card-section">
+      <div class="section-title"><i class="ti ti-edit"></i> <span data-i18n="sec_other">इतर माहिती</span></div>
+      <div class="grid2">
+        <div class="field"><label data-i18n="lbl_alive">जिवंत आहे?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="jivant" value="होय"> <span data-i18n="rdo_yes">होय</span></label>
+            <label><input type="radio" name="jivant" value="नाही"> <span data-i18n="rdo_no">नाही</span></label>
+          </div>
+        </div>
+        <div class="field"><label data-i18n="lbl_shera">शेरा (टीप)</label><input type="text" id="shera" placeholder="अतिरिक्त माहिती"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="saveRecord()"><i class="ti ti-circle-check"></i> <span data-i18n="btn_save">नोंद जतन करा</span></button>
+      <button class="btn-secondary" onclick="clearForm()" data-i18n="btn_clear">साफ करा</button>
+    </div>
+  </div>
+
+  <div id="view-list" style="display:none;">
+    <div id="list-container"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- TRANSLATION DICTIONARY ---
+const i18n = {
+  mr: {
+    title: "कुटुंब सर्वेक्षण नोंद", settings_btn: "सेटिंग्ज", setting_lang: "भाषा / Language:", setting_theme: "थीम / Theme:",
+    tab_new: "नवीन नोंद", tab_view: "नोंदी पहा", sec_home: "घर माहिती", lbl_ghar_kr: "घर क्र.", lbl_kutumb_kr: "कुटुंब क्र.",
+    lbl_anu_kr: "अनु क्र.", sec_member: "सदस्य माहिती", lbl_nav: "नाव *", lbl_nate: "नाते", opt_select: "निवडा",
+    opt_self: "स्वतः (प्रमुख)", opt_spouse: "पती/पत्नी", opt_son: "मुलगा", opt_daughter: "मुलगी", opt_dil: "सून", opt_sil: "जावई",
+    opt_parents: "आई/वडील", opt_grandchild: "नातू/नात", opt_other: "इतर", lbl_gender: "लिंग", rdo_male: "पुरुष", rdo_female: "महिला",
+    rdo_gender_other: "इतर", lbl_dob: "जन्मतारीख", sec_religion: "धर्म / जात", lbl_religion: "धर्म", rel_hindu: "हिंदू",
+    rel_muslim: "मुस्लिम", rel_buddhist: "बौद्ध", rel_christian: "ख्रिस्ती", rel_sikh: "शीख", rel_jain: "जैन", lbl_caste: "जात / जमाती",
+    sec_social: "सामाजिक स्थिती", lbl_bpl: "दारिद्र्य रेषेखालील?", rdo_yes: "होय", rdo_no: "नाही", lbl_pregnant: "सध्या गरोदर आहे?",
+    rdo_na: "लागू नाही", sec_contact: "संपर्क", lbl_mobile: "मोबाईल नंबर", sec_aadhar: "आधार कार्ड", lbl_aadhar_no: "आधार नंबर",
+    lbl_has_aadhar: "आधार कार्ड आहे का?", btn_yes_upload: "✓ होय — अपलोड", btn_no_label: "✗ नाही", ai_read_msg: "फोटो अपलोड करा — AI नंबर वाचेल",
+    upload_box_label: "फोटो निवडा किंवा कॅмера वापरा", btn_ocr_aadhar: "AI ने आधार नंबर वाचा", btn_use_form: "फॉर्ममध्ये वापरा",
+    btn_reupload: "पुन्हा अपलोड", sec_abha: "आभा कार्ड (ABHA)", lbl_abha_no: "आभा नंबर", lbl_has_abha: "आभा कार्ड आहे का?",
+    btn_ocr_abha: "AI ने आभा नंबर वाचा", sec_ayush: "आयुष्मान कार्ड", lbl_ayush_no: "आयुष्मान कार्ड नंबर", lbl_has_ayush: "आयुष्मान कार्ड आहे का?",
+    btn_ocr_ayush: "AI ने आयुष्मान नंबर वाचा", sec_other: "इतर माहिती", lbl_alive: "जिवंत आहे?", lbl_shera: "शेरा (टीप)",
+    btn_save: "नोंद जतन करा", btn_clear: "साफ करा", empty_msg: "अद्याप कोणतीही नोंद नाही", badge_suffix: " नोंदी",
+    toast_saved: "नोंद यशस्वीरीत्या जतन केली ✓", toast_deleted: "नोंद हटवली", toast_err: "चूक झाली, पुन्हा करा",
+    toast_fill_name: "कृपया नाव भरा ⚠️", toast_form_filled: "माहिती फॉर्ममध्ये भरली ✓", toast_no_rec: "नोंद नाही",
+    ocr_reading: "वाचत आहे...", ocr_done: "वाचले!", ocr_retry: "पुन्हा प्रयत्न करा"
+  },
+  hi: {
+    title: "परिवार सर्वेक्षण प्रविष्टि", settings_btn: "सेटिंग्स", setting_lang: "भाषा / Language:", setting_theme: "थीम / Theme:",
+    tab_new: "नई प्रविष्टि", tab_view: "प्रविष्टियाँ देखें", sec_home: "घर की जानकारी", lbl_ghar_kr: "घर क्र.", lbl_kutumb_kr: "परिवार क्र.",
+    lbl_anu_kr: "अनु क्र.", sec_member: "सदस्य की जानकारी", lbl_nav: "नाम *", lbl_nate: "संबंध", opt_select: "चुनें",
+    opt_self: "स्वयं (मुखिया)", opt_spouse: "पति/पत्नी", opt_son: "पुत्र", opt_daughter: "पुत्री", opt_dil: "बहू", opt_sil: "दामाद",
+    opt_parents: "माता/पिता", opt_grandchild: "पोता/पोती", opt_other: "अन्य", lbl_gender: "लिंग", rdo_male: "पुरुष", rdo_female: "महिला",
+    rdo_gender_other: "अन्य", lbl_dob: "जन्म तिथि", sec_religion: "धर्म / जाति", lbl_religion: "धर्म", rel_hindu: "हिंदू",
+    rel_muslim: "मुस्लिम", rel_buddhist: "बौद्ध", rel_christian: "ईसाई", rel_sikh: "सिख", rel_jain: "जैन", lbl_caste: "जाति / जनजाति",
+    sec_social: "सामाजिक स्थिति", lbl_bpl: "गरीबी रेखा से नीचे?", rdo_yes: "हाँ", rdo_no: "नहीं", lbl_pregnant: "क्या वर्तमान में गर्भवती हैं?",
+    rdo_na: "लागू नहीं", sec_contact: "संपर्क", lbl_mobile: "मोबाइल नंबर", sec_aadhar: "आधार कार्ड", lbl_aadhar_no: "आधार नंबर",
+    lbl_has_aadhar: "क्या आधार कार्ड है?", btn_yes_upload: "✓ हाँ — अपलोड", btn_no_label: "✗ नहीं", ai_read_msg: "फोटो अपलोड करें — AI नंबर पढ़ेगा",
+    upload_box_label: "फोटो चुनें या कैमरा उपयोग करें", btn_ocr_aadhar: "AI से आधार नंबर पढ़ें", btn_use_form: "फॉर्म में उपयोग करें",
+    btn_reupload: "पुनः अपलोड करें", sec_abha: "आभा कार्ड (ABHA)", lbl_abha_no: "आभा नंबर", lbl_has_abha: "क्या आभा कार्ड है?",
+    btn_ocr_abha: "AI से आभा नंबर पढ़ें", sec_ayush: "आयुष्मान कार्ड", lbl_ayush_no: "आयुष्मान कार्ड नंबर", lbl_has_ayush: "क्या आयुष्मान कार्ड है?",
+    btn_ocr_ayush: "AI से आयुष्मान नंबर पढ़ें", sec_other: "अन्य जानकारी", lbl_alive: "क्या जीवित हैं?", lbl_shera: "टिप्पणी",
+    btn_save: "प्रविष्टि सुरक्षित करें", btn_clear: "साफ करें", empty_msg: "अभी तक कोई रिकॉर्ड नहीं है", badge_suffix: " प्रविष्टियाँ",
+    toast_saved: "प्रविष्टि सफलतापूर्वक सुरक्षित की गई ✓", toast_deleted: "प्रविष्टि हटा दी गई", toast_err: "त्रुटि हुई, फिर से प्रयास करें",
+    toast_fill_name: "कृपया नाम भरें ⚠️", toast_form_filled: "जानकारी फॉर्म में भर दी गई ✓", toast_no_rec: "कोई रिकॉर्ड नहीं",
+    ocr_reading: "पढ़ रहा है...", ocr_done: "पढ़ा गया!", ocr_retry: "पुनः प्रयास करें"
+  },
+  en: {
+    title: "Family Survey Record", settings_btn: "Settings", setting_lang: "Language:", setting_theme: "Theme:",
+    tab_new: "New Entry", tab_view: "View Records", sec_home: "Household Info", lbl_ghar_kr: "House No.", lbl_kutumb_kr: "Family No.",
+    lbl_anu_kr: "Sr. No.", sec_member: "Member Info", lbl_nav: "Name *", lbl_nate: "Relation", opt_select: "Select",
+    opt_self: "Self (Head)", opt_spouse: "Spouse", opt_son: "Son", opt_daughter: "Daughter", opt_dil: "Daughter-in-law", opt_sil: "Son-in-law",
+    opt_parents: "Parents", opt_grandchild: "Grandchild", opt_other: "Other", lbl_gender: "Gender", rdo_male: "Male", rdo_female: "Female",
+    rdo_gender_other: "Other", lbl_dob: "Date of Birth", sec_religion: "Religion / Caste", lbl_religion: "Religion", rel_hindu: "Hindu",
+    rel_muslim: "Muslim", rel_buddhist: "Buddhist", rel_christian: "Christian", rel_sikh: "Sikh", rel_jain: "Jain", lbl_caste: "Caste / Tribe",
+    sec_social: "Social Status", lbl_bpl: "Below Poverty Line (BPL)?", rdo_yes: "Yes", rdo_no: "No", lbl_pregnant: "Currently Pregnant?",
+    rdo_na: "Not Applicable", sec_contact: "Contact", lbl_mobile: "Mobile Number", sec_aadhar: "Aadhaar Card", lbl_aadhar_no: "Aadhaar Number",
+    lbl_has_aadhar: "Do you have Aadhaar?", btn_yes_upload: "✓ Yes — Upload", btn_no_label: "✗ No", ai_read_msg: "Upload Photo — AI will read number",
+    upload_box_label: "Choose photo or use Camera", btn_ocr_aadhar: "Read Aadhaar with AI", btn_use_form: "Use in Form",
+    btn_reupload: "Re-upload", sec_abha: "ABHA Card", lbl_abha_no: "ABHA Number", lbl_has_abha: "Do you have ABHA?",
+    btn_ocr_abha: "Read ABHA with AI", sec_ayush: "Ayushman Card", lbl_ayush_no: "Ayushman Card Number", lbl_has_ayush: "Do you have Ayushman?",
+    btn_ocr_ayush: "Read Ayushman with AI", sec_other: "Other Info", lbl_alive: "Is Alive?", lbl_shera: "Remarks",
+    btn_save: "Save Record", btn_clear: "Clear Form", empty_msg: "No records found yet", badge_suffix: " Records",
+    toast_saved: "Record saved successfully ✓", toast_deleted: "Record deleted", toast_err: "Error occurred, try again",
+    toast_fill_name: "Please enter name ⚠️", toast_form_filled: "Information filled in form ✓", toast_no_rec: "No records",
+    ocr_reading: "Reading...", ocr_done: "Read Successfully!", ocr_retry: "Try Again"
+  }
+};
+
+let currentLang = 'mr';
+let records = [];
+try { records = JSON.parse(localStorage.getItem('mg_v4') || '[]'); } catch(e){}
+
+const imgData = { aadhar: null, abha: null, ayush: null };
+const ocrRes  = { aadhar: {}, abha: {}, ayush: {} };
+const cardVal = { aadhar: '', abha: '', ayush: '' };
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
+  });
+  
+  document.getElementById('nav').placeholder = lang === 'en' ? "Enter full name" : lang === 'hi' ? "पूर्ण नाम लिखें" : "पूर्ण नाव लिखा";
+  document.getElementById('jaat').placeholder = lang === 'en' ? "Enter caste" : lang === 'hi' ? "जाति लिखें" : "जात लिखा";
+  document.getElementById('mobile').placeholder = lang === 'en' ? "10 digit number" : lang === 'hi' ? "10 अंकों का नंबर" : "10 अंकी नंबर";
+  document.getElementById('shera').placeholder = lang === 'en' ? "Extra info" : lang === 'hi' ? "अतिरिक्त जानकारी" : "अतिरिक्त माहिती";
+  
+  updateBadge();
+  if(document.getElementById('view-list').style.display !== 'none') {
+    renderList();
+  }
+}
+
+function changeTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('survey_theme', theme);
+}
+
+function toggleSettings() {
+  const panel = document.getElementById('settings-panel');
+  panel.classList.toggle('visible');
+}
+
+function toggleCard(type, val, btn) {
+  cardVal[type] = val;
+  const box = btn.closest('.yn-group');
+  box.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const us = document.getElementById('us-'+type);
+  if (val === 'yes') {
+    us.classList.remove('hidden'); us.classList.add('visible');
+  } else {
+    us.classList.remove('visible'); us.classList.add('hidden');
+    resetUpload(type);
+  }
+}
+
+function handleFile(input, type) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgData[type] = e.target.result.split(',')[1];
+    document.getElementById('img-'+type).src = e.target.result;
+    document.getElementById('uz-'+type).style.display = 'none';
+    document.getElementById('pv-'+type).style.display = '';
+    document.getElementById('res-'+type).style.display = 'none';
+    const btn = document.getElementById('obtn-'+type);
+    btn.disabled = false; btn.style.background = '';
+    
+    let btnLabel = type==='aadhar' ? i18n[currentLang].btn_ocr_aadhar : type==='abha' ? i18n[currentLang].btn_ocr_abha : i18n[currentLang].btn_ocr_ayush;
+    btn.innerHTML = `<i class="ti ti-sparkles"></i> ${btnLabel}`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function runOCR(type) {
+  if (!imgData[type]) return;
+  const btn = document.getElementById('obtn-'+type);
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> ${i18n[currentLang].ocr_reading}`;
+
+  const prompts = {
+    aadhar: 'This is an Indian Aadhaar card. Extract and return ONLY this JSON, no other text:\n{"aadhar_number":"12 digit with spaces","name":"full name","dob":"YYYY-MM-DD or empty","gender":"Male or Female or empty"}',
+    abha:   'This is an Indian ABHA health card. Extract and return ONLY this JSON, no other text:\n{"abha_number":"formatted XX-XXXX-XXXX-XXXX or empty","name":"full name or empty","dob":"YYYY-MM-DD or empty"}',
+    ayush:  'This is an Indian Ayushman Bharat / PMJAY card. Extract and return ONLY this JSON, no other text:\n{"card_number":"number as printed or empty","name":"full name or empty"}'
+  };
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6', max_tokens: 400,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imgData[type] } },
+          { type: 'text', text: prompts[type] }
+        ]}]
+      })
+    });
+    const data = await res.json();
+    const txt = data.content?.find(c=>c.type==='text')?.text || '{}';
+    let parsed = {};
+    try { parsed = JSON.parse(txt.replace(/```json|```/g,'').trim()); }
+    catch(e) { const m=txt.match(/\{[\s\S]*\}/); if(m) try{ parsed=JSON.parse(m[0]); }catch(e2){} }
+
+    ocrRes[type] = parsed;
+
+    if (type === 'aadhar') {
+      set('rv-aadhar-num',  parsed.aadhar_number);
+      set('rv-aadhar-name', parsed.name);
+      set('rv-aadhar-dob',  parsed.dob);
+      set('rv-aadhar-gen',  parsed.gender);
+    } else if (type === 'abha') {
+      set('rv-abha-num',  parsed.abha_number);
+      set('rv-abha-name', parsed.name);
+      set('rv-abha-dob',  parsed.dob);
+    } else {
+      set('rv-ayush-num',  parsed.card_number);
+      set('rv-ayush-name', parsed.name);
+    }
+
+    document.getElementById('res-'+type).style.display = '';
+    btn.innerHTML = `<i class="ti ti-check"></i> ${i18n[currentLang].ocr_done}`;
+    btn.style.background = '#00875a';
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="ti ti-refresh"></i> ${i18n[currentLang].ocr_retry}`;
+    showToast(i18n[currentLang].toast_err, true);
+  }
+}
+
+function set(id, val) {
+  document.getElementById(id).textContent = val || (currentLang==='en'?'Not Found':currentLang==='hi'?'नहीं मिला':'आढळले नाही');
+}
+
+function applyOCR(type) {
+  const d = ocrRes[type];
+  const nameField = document.getElementById('nav');
+  
+  if (type === 'aadhar') {
+    if (d.aadhar_number) document.getElementById('aadhar').value = d.aadhar_number;
+    if (d.name && !nameField.value.trim()) nameField.value = d.name;
+    if (d.dob) document.getElementById('dob').value = d.dob;
+    if (d.gender) { const g=d.gender==='Male'?'पुरुष':'महिला'; const r=document.querySelector(`input[name="ling"][value="${g}"]`); if(r) r.checked=true; }
+  } else if (type === 'abha') {
+    if (d.abha_number) document.getElementById('abha_no').value = d.abha_number;
+    if (d.name && !nameField.value.trim()) nameField.value = d.name;
+    if (d.dob && !document.getElementById('dob').value) document.getElementById('dob').value = d.dob;
+  } else {
+    if (d.card_number) document.getElementById('ayush_no').value = d.card_number;
+    if (d.name && !nameField.value.trim()) nameField.value = d.name;
+  }
+  showToast(i18n[currentLang].toast_form_filled);
+}
+
+function resetUpload(type) {
+  imgData[type] = null; ocrRes[type] = {};
+  const fi = document.querySelector(`#uz-${type} input[type=file]`);
+  if(fi) fi.value='';
+  const pv = document.getElementById('pv-'+type);
+  const uz = document.getElementById('uz-'+type);
+  if(pv) pv.style.display='none';
+  if(uz) uz.style.display='';
+  const res = document.getElementById('res-'+type);
+  if(res) res.style.display='none';
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-form').style.display = tab==='form'?'':'none';
+  document.getElementById('view-list').style.display = tab==='list'?'':'none';
+  if(tab==='list') renderList();
+}
+
+function getR(name) { const e=document.querySelector(`input[name="${name}"]:checked`); return e?e.value:''; }
+
+function saveRecord() {
+  const nav = document.getElementById('nav').value.trim();
+  if (!nav) { showToast(i18n[currentLang].toast_fill_name, true); return; }
+  const dob = document.getElementById('dob').value;
+  const age = dob ? Math.floor((Date.now()-new Date(dob).getTime())/(1000*60*60*24*365.25)) : '';
+  const rec = {
+    id: Date.now(), nav, ling: getR('ling'),
+    ghar_kr: document.getElementById('ghar_kr').value,
+    kutumb_kr: document.getElementById('kutumb_kr').value,
+    anu_kr: document.getElementById('anu_kr').value,
+    nate: document.getElementById('nate').value, dob, age,
+    dharma: document.getElementById('dharma').value,
+    jaat: document.getElementById('jaat').value,
+    bpl: getR('bpl'), garodar: getR('garodar'),
+    mobile: document.getElementById('mobile').value,
+    aadhar: document.getElementById('aadhar').value, aadhar_has: cardVal.aadhar,
+    abha_no: document.getElementById('abha_no').value, abha_has: cardVal.abha,
+    ayush_no: document.getElementById('ayush_no').value, ayush_has: cardVal.ayush,
+    jivant: getR('jivant'), shera: document.getElementById('shera').value
+  };
+  records.push(rec);
+  try { localStorage.setItem('mg_v4', JSON.stringify(records)); } catch(e){}
+  updateBadge(); showToast(i18n[currentLang].toast_saved); clearForm();
+}
+
+function clearForm() {
+  ['ghar_kr','kutumb_kr','anu_kr','nav','dob','jaat','mobile','aadhar','abha_no','ayush_no','shera'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['nate','dharma'].forEach(id=>document.getElementById(id).value='');
+  ['ling','bpl','garodar','jivant'].forEach(n=>{const c=document.querySelector(`input[name="${n}"]:checked`);if(c)c.checked=false;});
+  ['aadhar','abha','ayush'].forEach(t=>{
+    cardVal[t]='';
+    document.querySelectorAll(`#us-${t}`).forEach(el=>{el.classList.remove('visible');el.classList.add('hidden');});
+    document.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('active'));
+    resetUpload(t);
+  });
+}
+
+function deleteRecord(id) {
+  records=records.filter(r=>r.id!==id);
+  try{localStorage.setItem('mg_v4',JSON.stringify(records));}catch(e){}
+  updateBadge(); renderList(); showToast(i18n[currentLang].toast_deleted);
+}
+
+function renderList() {
+  const c=document.getElementById('list-container');
+  if(!records.length){c.innerHTML=`<div class="empty-state"><i class="ti ti-database-off" style="font-size:32px;display:block;margin-bottom:10px;color:var(--primary)"></i>${i18n[currentLang].empty_msg}</div>`;return;}
+  const yn=v=>v==='yes'?'<span style="color:#00875a;font-weight:bold">✓</span>':'<span style="color:#de350b;font-weight:bold">✗</span>';
+  
+  let aad_lbl = currentLang==='en'?'Aadhar':currentLang==='hi'?'आधार':'आधार';
+  let abh_lbl = currentLang==='en'?'ABHA':currentLang==='hi'?'आभा':'आभा';
+  let ayu_lbl = currentLang==='en'?'Ayushman':currentLang==='hi'?'आयुष्मान':'आयुष्मान';
+  let age_lbl = currentLang==='en'?'Age':currentLang==='hi'?'उम्र':'वय';
+
+  c.innerHTML=records.map(r=>`
+    <div class="saved-card">
+      <div>
+        <div class="sname">${r.nav} <span style="font-weight:500;font-size:13px;color:var(--text-sub);">(${r.ling||'—'}, ${age_lbl} ${r.age||'—'})</span></div>
+        <div class="smeta">${aad_lbl} ${yn(r.aadhar_has)} ${r.aadhar||'—'} &nbsp;·&nbsp; ${abh_lbl} ${yn(r.abha_has)} ${r.abha_no||'—'} &nbsp;·&nbsp; ${ayu_lbl} ${yn(r.ayush_has)}</div>
+      </div>
+      <button class="del-btn" onclick="deleteRecord(${r.id})"><i class="ti ti-trash" style="font-size:16px"></i></button>
+    </div>`).join('');
+}
+
+function updateBadge(){
+  document.getElementById('count-badge').textContent=`${records.length}${i18n[currentLang].badge_suffix}`;
+}
+
+function exportCSV(){
+  if(!records.length){showToast(i18n[currentLang].toast_no_rec, true);return;}
+  const h=['घर क्र','कुटुंब क्र','अनु क्र','नाव','लिंग','नाते','जन्मतारीख','वय','धर्म','जात','BPL','गरोदर','मोबाईल','आधार नंबर','आधार कार्ड आहे','आभा नंबर','आभा कार्ड आहे','आयुष्मान नंबर','आयुष्मान कार्ड आहे','जिवंत','शेरा'];
+  const rows=records.map(r=>[r.ghar_kr,r.kutumb_kr,r.anu_kr,r.nav,r.ling,r.nate,r.dob,r.age,r.dharma,r.jaat,r.bpl,r.garodar,r.mobile,r.aadhar,r.aadhar_has==='yes'?'होय':'नाही',r.abha_no,r.abha_has==='yes'?'होय':'नाही',r.ayush_no,r.ayush_has==='yes'?'होय':'नाही',r.jivant,r.shera].map(v=>`"${v||''}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='maregaon_survey.csv';a.click();
+  showToast(currentLang==='en'?'CSV Downloaded ✓':currentLang==='hi'?'CSV डाउनलोड हुई ✓':'CSV डाउनलोड झाली ✓');
+}
+
+function showToast(msg,warn){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=warn?'#de350b':'#00875a';t.style.color='#ffffff';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function fmtAadhar(el) {
+  let v = el.value.replace(/\s/g, '').replace(/\D/g, '');
+  let m = v.match(/^(\d{1,4})(\d{0,4})(\d{0,4})$/);
+  if (m) {
+    el.value = m[1] + (m[2] ? ' ' + m[2] : '') + (m[3] ? ' ' + m[3] : '');
+  }
+}
+
+function fmtAbha(el) {
+  let v = el.value.replace(/\D/g, '');
+  let m = v.match(/^(\d{1,2})(\d{0,4})(\d{0,4})(\d{0,4})$/);
+  if (m) {
+    el.value = m[1] + (m[2] ? '-' + m[2] : '') + (m[3] ? '-' + m[3] : '') + (m[4] ? '-' + m[4] : '');
+  }
+}
+
+// Initial System Setup
+const savedTheme = localStorage.getItem('survey_theme') || 'light';
+document.getElementById('theme-select').value = savedTheme;
+changeTheme(savedTheme);
+changeLanguage('mr');
+</script>
+
+</body>
+</html>
